@@ -1,5 +1,5 @@
-# ece324-project
-Shared google drive: [ECE324 Project](https://drive.google.com/drive/u/0/folders/1QhMFeDHl5j8NSm3v894nMAK9RlR2LuIv)
+# SmartStudy
+Shared google drive: [ECE324 Project](https://drive.google.com/drive/u/0/folders/1QhMFeDHl5j8NSm3v894nMAK9RlR2LuIv) | 
 Task Manager: [Tasks List](https://docs.google.com/document/d/1e2kWQzt1sx-rwJIAR3klsLPsUbelSIuSbegV5a7g7fU/edit?tab=t.0)
 
 ## proposal brainstorming
