@@ -31,5 +31,8 @@ academically.
 ## next steps
 * data cleaning & pre-processing (Najma)
 * exploratory data anlysis, data visualization (Heraa)
-* building the model (Elorie)
+* building the baseline - Linear regression model (Elorie)
+* reiterating on the model (random forest/gradient boosting model, optimize hyperparameters,evaluate feature importance)
+* evaluation and comparing models
 * literature reviews (everyone)
+* paper writing (everyone)
