@@ -1,24 +1,9 @@
 # ece324-project
+Shared google drive: [ECE324 Project](https://drive.google.com/drive/u/0/folders/1QhMFeDHl5j8NSm3v894nMAK9RlR2LuIv)
+Task Manager: [Tasks List](https://docs.google.com/document/d/1e2kWQzt1sx-rwJIAR3klsLPsUbelSIuSbegV5a7g7fU/edit?tab=t.0)
 
-## ideas
-
-### productivity
-* project manager / syllabus thing / task manager
-* Dream Job Tracker with ML Assistant
-* Adaptive Pomodoro Timer (Instead of the standard 25 minutes of work followed by a 5-minute break, the app would use ML to predict how long the user can maintain focus and adjust the work and break intervals accordingly)
-* 
-
-### health
-* alzeihmers detection (through speech or else)
-* sleep cycle detector and alarm
-* ingredient checker
-
-
-### education
-
-
-### fun
-
+## proposal brainstorming
+Summary notes for our brainstorming can be found here: [1-proposal-brainstorm.pdf](https://github.com/elorie-bernard-lacroix/ece324-project/blob/main/process-documentation/1-proposal-brainstorm.pdf)
 
 ## final proposal
 Students often feel overwhelmed with work, deadlines, and extracurriculars. The stress of managing these 
@@ -26,13 +11,4 @@ responsibilities can make it difficult for students to establish effective study
 development of a machine learning model designed to recommend personalized lifestyle changes, such as the 
 optimal weekly study time, the need for tutoring, and increased lecture attendance for students. Overall, this tool 
 aims to increase organization and time-management among students and ultimately help them succeed 
-academically.
-
-## next steps
-* data cleaning & pre-processing (Najma)
-* exploratory data anlysis, data visualization (Heraa)
-* building the baseline - Linear regression model (Elorie)
-* reiterating on the model (random forest/gradient boosting model, optimize hyperparameters,evaluate feature importance)
-* evaluation and comparing models
-* literature reviews (everyone)
-* paper writing (everyone)
+academically. More details are available here: [2-final-proposal.pdf](https://github.com/elorie-bernard-lacroix/ece324-project/blob/main/process-documentation/2-final-proposal.pdf)
