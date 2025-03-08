@@ -7,4 +7,10 @@ pip
 python-dotenv
 tqdm
 typer
+numpy
+tensorflow
+pandas
+seaborn
+matplotlib
+
 -e .
