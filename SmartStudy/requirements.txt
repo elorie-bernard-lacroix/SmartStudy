@@ -12,5 +12,6 @@ tensorflow
 pandas
 seaborn
 matplotlib
-
+xgboost
+tabpfn
 -e .
