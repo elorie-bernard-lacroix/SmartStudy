@@ -29,7 +29,7 @@ def predict_gpa(model, scaler, user_input, columns):
     return round(model.predict(df_scaled)[0], 2)
 
 # Coordinate Descent Optimization
-def optimize_input(model, scaler, base_input, columns, desired_gpa):  # Add desired_gpa as a parameter
+def optimize_input(model, scaler, base_input, columns, desired_gpa):
     user_df = pd.DataFrame([base_input])  # Convert base input to DataFrame
 
     # Ensure the DataFrame has the correct columns
@@ -66,7 +66,15 @@ def optimize_input(model, scaler, base_input, columns, desired_gpa):  # Add desi
                     best_grade = pred
                     best_params[param] = value
 
-        # Break if the desired GPA is achieved
+                    # Stop if the desired GPA is achieved
+                    if best_grade >= desired_gpa:
+                        break
+
+            # Break outer loop if the desired GPA is achieved
+            if best_grade >= desired_gpa:
+                break
+
+        # Break while loop if the desired GPA is achieved
         if best_grade >= desired_gpa:
             break
 
