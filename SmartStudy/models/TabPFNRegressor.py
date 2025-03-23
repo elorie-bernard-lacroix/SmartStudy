@@ -21,15 +21,19 @@ def train_model(X, y):
 # Predict GPA from user input
 def predict_gpa(model, scaler, user_input, columns):
     df = pd.DataFrame([user_input])[columns]
+    df["ParentalInfluence"] = df["ParentalSupport"] + df["ParentalEducation"]
+    df["TutoringEffect"] = df["Tutoring"] + df["StudyTimeWeekly"]
     df_scaled = scaler.transform(df)
     return round(model.predict(df_scaled)[0], 2)
 
 # Coordinate Descent Optimization based on real logic
 def optimize_input(model, scaler, base_input, columns):
     user_df = pd.DataFrame([base_input])[columns]
-    user_scaled = scaler.transform(user_df)
-    best_grade = model.predict([user_scaled[0]])[0]
     best_params = user_df.copy()
+    best_params["ParentalInfluence"] = best_params["ParentalSupport"] + best_params["ParentalEducation"]
+    best_params["TutoringEffect"] = best_params["Tutoring"] + best_params["StudyTimeWeekly"]
+    user_scaled = scaler.transform(best_params[columns])
+    best_grade = model.predict([user_scaled[0]])[0]
 
     # Define tunable parameters and values to search
     params_to_change = ['Absences', 'StudyTimeWeekly', 'Tutoring', 'Sports', 'Extracurricular', 'Music', 'Volunteering']
@@ -47,8 +51,12 @@ def optimize_input(model, scaler, base_input, columns):
         for value in values[param]:
             test_params = best_params.copy()
             test_params[param] = value
-            scaled = scaler.transform(test_params)
+            test_params["ParentalInfluence"] = test_params["ParentalSupport"] + test_params["ParentalEducation"]
+            test_params["TutoringEffect"] = test_params["Tutoring"] + test_params["StudyTimeWeekly"]
+
+            scaled = scaler.transform(test_params[columns])
             pred = model.predict([scaled[0]])[0]
+
             if pred > best_grade:
                 best_grade = pred
                 best_params = test_params.copy()
