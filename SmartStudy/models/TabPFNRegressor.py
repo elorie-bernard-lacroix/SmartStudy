@@ -4,7 +4,7 @@ from sklearn.preprocessing import StandardScaler
 from tabpfn import TabPFNRegressor
 
 # Load dataset
-def load_dataset(path="dataset.csv"):
+def load_dataset(path="data/processed/dataset.csv"):
     df = pd.read_csv(path)
     X = df.drop(columns=["GPA"])
     y = df["GPA"]
@@ -26,8 +26,10 @@ def predict_gpa(model, scaler, user_input, columns):
     df["ParentalInfluence"] = df["ParentalSupport"] + df["ParentalEducation"]
     df["TutoringEffect"] = df["Tutoring"] + df["StudyTimeWeekly"]
 
-    # Keep only required columns
+    # Ensure the DataFrame has the correct columns
     df = df[columns]
+    
+    # Scale the data and make a prediction
     df_scaled = scaler.transform(df)
     return round(model.predict(df_scaled)[0], 2)
 
@@ -38,6 +40,8 @@ def optimize_input(model, scaler, base_input, columns):
     # Add engineered features for initial evaluation
     user_df["ParentalInfluence"] = user_df["ParentalSupport"] + user_df["ParentalEducation"]
     user_df["TutoringEffect"] = user_df["Tutoring"] + user_df["StudyTimeWeekly"]
+
+    # Ensure the DataFrame has the correct columns
     user_df = user_df[columns]
 
     best_grade = model.predict([scaler.transform(user_df)[0]])[0]
@@ -65,6 +69,7 @@ def optimize_input(model, scaler, base_input, columns):
             test_params["ParentalInfluence"] = test_params["ParentalSupport"] + test_params["ParentalEducation"]
             test_params["TutoringEffect"] = test_params["Tutoring"] + test_params["StudyTimeWeekly"]
 
+            # Ensure the DataFrame has the correct columns
             test_params = test_params[columns]
             scaled = scaler.transform(test_params)
             pred = model.predict([scaled[0]])[0]
