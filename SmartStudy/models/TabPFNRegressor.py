@@ -42,7 +42,7 @@ def optimize_input(model, scaler, base_input, columns):
     params_to_change = ['Absences', 'StudyTimeWeekly', 'Tutoring', 'Sports', 'Extracurricular', 'Music', 'Volunteering']
     values = {
         'Absences': [0, 5, 10, 20],
-        'StudyTimeWeekly': [5, 10, 20, 30],
+        'StudyTimeWeekly': [5, 10, 15, 20],
         'Tutoring': [0, 1],
         'Sports': [0, 1],
         'Extracurricular': [0, 1],
@@ -67,5 +67,5 @@ def optimize_input(model, scaler, base_input, columns):
 
     # Finalize output
     best_output = best_params.iloc[0].to_dict()
-    best_output["PredictedGPA"] = round(best_grade, 2)
+    best_output["PredictedGPA"] = round(min(best_grade, 4.0), 2)  # cap at 4.0
     return best_output
