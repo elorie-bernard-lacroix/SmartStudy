@@ -20,22 +20,30 @@ def train_model(X, y):
 
 # Predict GPA from user input
 def predict_gpa(model, scaler, user_input, columns):
-    df = pd.DataFrame([user_input])[columns]
+    df = pd.DataFrame([user_input])
+    
+    # Add engineered features
     df["ParentalInfluence"] = df["ParentalSupport"] + df["ParentalEducation"]
     df["TutoringEffect"] = df["Tutoring"] + df["StudyTimeWeekly"]
+
+    # Keep only required columns
+    df = df[columns]
     df_scaled = scaler.transform(df)
     return round(model.predict(df_scaled)[0], 2)
 
-# Coordinate Descent Optimization based on real logic
+# Coordinate Descent Optimization
 def optimize_input(model, scaler, base_input, columns):
-    user_df = pd.DataFrame([base_input])[columns]
-    best_params = user_df.copy()
-    best_params["ParentalInfluence"] = best_params["ParentalSupport"] + best_params["ParentalEducation"]
-    best_params["TutoringEffect"] = best_params["Tutoring"] + best_params["StudyTimeWeekly"]
-    user_scaled = scaler.transform(best_params[columns])
-    best_grade = model.predict([user_scaled[0]])[0]
+    user_df = pd.DataFrame([base_input])
 
-    # Define tunable parameters and values to search
+    # Add engineered features for initial evaluation
+    user_df["ParentalInfluence"] = user_df["ParentalSupport"] + user_df["ParentalEducation"]
+    user_df["TutoringEffect"] = user_df["Tutoring"] + user_df["StudyTimeWeekly"]
+    user_df = user_df[columns]
+
+    best_grade = model.predict([scaler.transform(user_df)[0]])[0]
+    best_params = pd.DataFrame([base_input])
+
+    # Define parameters to search
     params_to_change = ['Absences', 'StudyTimeWeekly', 'Tutoring', 'Sports', 'Extracurricular', 'Music', 'Volunteering']
     values = {
         'Absences': [0, 5, 10, 20],
@@ -47,19 +55,27 @@ def optimize_input(model, scaler, base_input, columns):
         'Volunteering': [0, 1]
     }
 
+    # Try all combinations
     for param in params_to_change:
         for value in values[param]:
             test_params = best_params.copy()
             test_params[param] = value
+
+            # Add engineered features again
             test_params["ParentalInfluence"] = test_params["ParentalSupport"] + test_params["ParentalEducation"]
             test_params["TutoringEffect"] = test_params["Tutoring"] + test_params["StudyTimeWeekly"]
 
-            scaled = scaler.transform(test_params[columns])
+            test_params = test_params[columns]
+            scaled = scaler.transform(test_params)
             pred = model.predict([scaled[0]])[0]
 
             if pred > best_grade:
                 best_grade = pred
-                best_params = test_params.copy()
+                best_params[param] = value
+
+    # Finalize output
+    best_params["ParentalInfluence"] = best_params["ParentalSupport"] + best_params["ParentalEducation"]
+    best_params["TutoringEffect"] = best_params["Tutoring"] + best_params["StudyTimeWeekly"]
 
     best_output = best_params.iloc[0].to_dict()
     best_output["PredictedGPA"] = round(best_grade, 2)
