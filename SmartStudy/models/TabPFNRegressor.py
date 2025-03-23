@@ -1,8 +1,6 @@
-
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import mean_squared_error, mean_absolute_error
 from tabpfn import TabPFNRegressor
 
 # Load dataset
@@ -26,25 +24,35 @@ def predict_gpa(model, scaler, user_input, columns):
     df_scaled = scaler.transform(df)
     return round(model.predict(df_scaled)[0], 2)
 
-# Optimization (coordinate search over key fields)
+# Coordinate Descent Optimization based on real logic
 def optimize_input(model, scaler, base_input, columns):
-    best_input = base_input.copy()
-    best_gpa = predict_gpa(model, scaler, best_input, columns)
+    user_df = pd.DataFrame([base_input])[columns]
+    user_scaled = scaler.transform(user_df)
+    best_grade = model.predict([user_scaled[0]])[0]
+    best_params = user_df.copy()
 
-    # Search over study time, tutoring, and attendance
-    for study_time in range(5, 20, 2):  # try 5 to 20 hours
-        for tutoring in [0, 1]:
-            for absences in range(0, 10):  # fewer absences
-                test_input = base_input.copy()
-                test_input["StudyTimeWeekly"] = study_time
-                test_input["Tutoring"] = tutoring
-                test_input["Absences"] = absences
+    # Define tunable parameters and values to search
+    params_to_change = ['Absences', 'StudyTimeWeekly', 'Tutoring', 'Sports', 'Extracurricular', 'Music', 'Volunteering']
+    values = {
+        'Absences': [0, 5, 10, 20],
+        'StudyTimeWeekly': [5, 10, 20, 30],
+        'Tutoring': [0, 1],
+        'Sports': [0, 1],
+        'Extracurricular': [0, 1],
+        'Music': [0, 1],
+        'Volunteering': [0, 1]
+    }
 
-                predicted = predict_gpa(model, scaler, test_input, columns)
-                if predicted > best_gpa:
-                    best_input = test_input
-                    best_input["PredictedGPA"] = predicted
-                    best_gpa = predicted
+    for param in params_to_change:
+        for value in values[param]:
+            test_params = best_params.copy()
+            test_params[param] = value
+            scaled = scaler.transform(test_params)
+            pred = model.predict([scaled[0]])[0]
+            if pred > best_grade:
+                best_grade = pred
+                best_params = test_params.copy()
 
-    best_input["PredictedGPA"] = best_gpa
-    return best_input
+    best_output = best_params.iloc[0].to_dict()
+    best_output["PredictedGPA"] = round(best_grade, 2)
+    return best_output
