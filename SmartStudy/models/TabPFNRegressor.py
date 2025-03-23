@@ -29,7 +29,7 @@ def predict_gpa(model, scaler, user_input, columns):
     return round(model.predict(df_scaled)[0], 2)
 
 # Coordinate Descent Optimization
-def optimize_input(model, scaler, base_input, columns):
+def optimize_input(model, scaler, base_input, columns, desired_gpa):
     user_df = pd.DataFrame([base_input])  # Convert base input to DataFrame
 
     # Ensure the DataFrame has the correct columns
@@ -50,22 +50,27 @@ def optimize_input(model, scaler, base_input, columns):
         'Volunteering': [0, 1]
     }
 
-    # Try all combinations
-    for param in params_to_change:
-        for value in values[param]:
-            test_params = best_params.copy()
-            test_params[param] = value
+    # Try all combinations until the desired GPA is achieved
+    while best_grade < desired_gpa:
+        for param in params_to_change:
+            for value in values[param]:
+                test_params = best_params.copy()
+                test_params[param] = value
 
-            # Ensure the DataFrame has the correct columns
-            test_params = test_params[columns]
-            scaled = scaler.transform(test_params)
-            pred = model.predict([scaled[0]])[0]
+                # Ensure the DataFrame has the correct columns
+                test_params = test_params[columns]
+                scaled = scaler.transform(test_params)
+                pred = model.predict([scaled[0]])[0]
 
-            if pred > best_grade:
-                best_grade = pred
-                best_params[param] = value
+                if pred > best_grade:
+                    best_grade = pred
+                    best_params[param] = value
+
+        # Break if the desired GPA is achieved
+        if best_grade >= desired_gpa:
+            break
 
     # Finalize output
     best_output = best_params.iloc[0].to_dict()
-    best_output["PredictedGPA"] = round(min(best_grade, 4.0), 2)  # cap at 4.0
+    best_output["PredictedGPA"] = round(min(best_grade, 4.0), 2)  # Cap at 4.0
     return best_output
