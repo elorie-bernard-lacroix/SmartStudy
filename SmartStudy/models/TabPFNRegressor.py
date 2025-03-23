@@ -1,13 +1,12 @@
 import pandas as pd
-from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from tabpfn import TabPFNRegressor
 
 # Load dataset
 def load_dataset(path="data/processed/dataset.csv"):
     df = pd.read_csv(path)
-    X = df.drop(columns=["GPA"])
-    y = df["GPA"]
+    X = df.drop(columns=["GPA"])  # Drop the target column
+    y = df["GPA"]  # Target column
     return X, y
 
 # Train TabPFN model and return with scaler
@@ -20,12 +19,8 @@ def train_model(X, y):
 
 # Predict GPA from user input
 def predict_gpa(model, scaler, user_input, columns):
-    df = pd.DataFrame([user_input])
+    df = pd.DataFrame([user_input])  # Convert user input to DataFrame
     
-    # Add engineered features
-    df["ParentalInfluence"] = df["ParentalSupport"] + df["ParentalEducation"]
-    df["TutoringEffect"] = df["Tutoring"] + df["StudyTimeWeekly"]
-
     # Ensure the DataFrame has the correct columns
     df = df[columns]
     
@@ -35,11 +30,7 @@ def predict_gpa(model, scaler, user_input, columns):
 
 # Coordinate Descent Optimization
 def optimize_input(model, scaler, base_input, columns):
-    user_df = pd.DataFrame([base_input])
-
-    # Add engineered features for initial evaluation
-    user_df["ParentalInfluence"] = user_df["ParentalSupport"] + user_df["ParentalEducation"]
-    user_df["TutoringEffect"] = user_df["Tutoring"] + user_df["StudyTimeWeekly"]
+    user_df = pd.DataFrame([base_input])  # Convert base input to DataFrame
 
     # Ensure the DataFrame has the correct columns
     user_df = user_df[columns]
@@ -65,10 +56,6 @@ def optimize_input(model, scaler, base_input, columns):
             test_params = best_params.copy()
             test_params[param] = value
 
-            # Add engineered features again
-            test_params["ParentalInfluence"] = test_params["ParentalSupport"] + test_params["ParentalEducation"]
-            test_params["TutoringEffect"] = test_params["Tutoring"] + test_params["StudyTimeWeekly"]
-
             # Ensure the DataFrame has the correct columns
             test_params = test_params[columns]
             scaled = scaler.transform(test_params)
@@ -79,9 +66,6 @@ def optimize_input(model, scaler, base_input, columns):
                 best_params[param] = value
 
     # Finalize output
-    best_params["ParentalInfluence"] = best_params["ParentalSupport"] + best_params["ParentalEducation"]
-    best_params["TutoringEffect"] = best_params["Tutoring"] + best_params["StudyTimeWeekly"]
-
     best_output = best_params.iloc[0].to_dict()
     best_output["PredictedGPA"] = round(best_grade, 2)
     return best_output
