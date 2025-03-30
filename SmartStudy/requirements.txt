@@ -1,17 +1,13 @@
-black
-flake8
-isort
-loguru
-mkdocs
-pip
-python-dotenv
-tqdm
-typer
-numpy
-tensorflow
-pandas
-seaborn
-matplotlib
+# python==3.11.4
+numpy==1.26.0
+scipy==1.11.1
+pandas==2.1.0
+matplotlib>=3.3.4
+seaborn>=0.9.0
+#plotly>=5.14.0
+scikit-learn
 xgboost
+bayesian-optimization
 tabpfn
--e .
+catboost
+tensorflow
