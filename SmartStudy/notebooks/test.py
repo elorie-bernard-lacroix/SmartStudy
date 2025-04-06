@@ -14,13 +14,10 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score, accuracy_score, make_scorer
 from scipy.stats import kendalltau
 from sklearn.ensemble import RandomForestRegressor
-from torch.utils.data import TensorDataset, DataLoader  # Added missing imports
-from pytorch_lightning.callbacks import EarlyStopping  # Added missing import
-from pytorch_tabnet.tab_model import TabNetRegressor  # Import TabNet
 
 # Loading Dataset
-#data = pd.read_csv("/content/drive/MyDrive/ECE324_Project/Model/dataset.csv") # change path for your env
-data = pd.read_csv("SmartStudy\\notebooks\\database.csv") # change path for your env
+data = pd.read_csv("/content/drive/MyDrive/ECE324_Project/Model/dataset.csv") # change path for your env
+#data = pd.read_csv("database.csv") # change path for your env
 data.head()
 
 # Data Splitting & Normalization
@@ -40,7 +37,7 @@ class SoftOrdering1DCNN(pl.LightningModule):
         hidden_size = sign_size * cha_input
         sign_size1 = sign_size
         sign_size2 = sign_size // 2
-        output_size = (sign_size2) * cha_hidden  # Corrected output size calculation
+        output_size = (sign_size // 4) * cha_hidden
 
         self.hidden_size = hidden_size
         self.cha_input = cha_input
@@ -88,16 +85,14 @@ class SoftOrdering1DCNN(pl.LightningModule):
         # 3rd conv layer (Output layer)
         self.batch_norm_c3 = nn.BatchNorm1d(cha_hidden)
         self.dropout_c3 = nn.Dropout(dropout_output)
-        self.dense2 = nn.Linear(output_size, output_dim)  # Corrected dense2 input size
+        self.dense2 = nn.Linear(output_size, output_dim)
         
         self.mse = MeanSquaredError()
         self.mae = MeanAbsoluteError()
         self.r2 = R2Score()
+        
 
     def forward(self, x):
-        if x.shape[1] != self.dense1.in_features:
-            raise ValueError(f"Input feature size mismatch. Expected {self.dense1.in_features}, got {x.shape[1]}.")
-
         x = self.batch_norm1(x)
         x = self.dropout1(x)
         x = torch.relu(self.dense1(x))
@@ -168,13 +163,18 @@ trainer = pl.Trainer(max_epochs=50, callbacks=[early_stopping])
 trainer.fit(model, train_loader, test_loader)  # Use train and validation loaders
 
 # 6. Make predictions and evaluate
-# Removed the redundant modification of `dense2` after training
-predictions = []
-model.eval()  # Set model to evaluation mode
-with torch.no_grad():
-    for x, _ in test_loader:
-        predictions.append(model(x))
-predictions = torch.cat(predictions).detach().numpy()
+# Get the actual output size after convolutions and reshaping
+# Pass a sample input through the model to get the output shape
+sample_input = X_test_tensor[0].unsqueeze(0)  # Take one sample from X_test_tensor
+output_shape = model(sample_input).shape
+
+# The output size you need is the number of features in the output
+output_size = output_shape[1]  
+
+# Modify the `dense2` layer in your model to match the correct input size
+model.dense2 = nn.Linear(output_size, 1)  # 1 output for regression
+
+predictions = torch.cat([model(x) for x, _ in test_loader]).detach().numpy() 
 
 # 7. Calculate and print evaluation metrics
 mse = mean_squared_error(Y_test, predictions)
@@ -186,79 +186,3 @@ print('Mean Squared Error:', mse)
 print('Mean Absolute Error:', mae)
 print('R2 Score:', r2)
 print('Kendall Tau:', kendall_tau_corr)
-
-class EnsembleModel(pl.LightningModule):
-    def __init__(self, cnn_model, tabnet_model, cnn_weight=0.5, tabnet_weight=0.5):
-        super().__init__()
-        self.cnn_model = cnn_model
-        self.tabnet_model = tabnet_model
-        self.cnn_weight = cnn_weight
-        self.tabnet_weight = tabnet_weight
-
-    def forward(self, x):
-        cnn_pred = self.cnn_model(x)
-        tabnet_pred = self.tabnet_model.predict(x.numpy())  # TabNet expects numpy input
-        tabnet_pred = torch.tensor(tabnet_pred, dtype=torch.float32).to(cnn_pred.device)
-        return self.cnn_weight * cnn_pred + self.tabnet_weight * tabnet_pred
-
-    def training_step(self, batch, batch_idx):
-        x, y = batch
-        y_hat = self(x)
-        loss = nn.MSELoss()(y_hat, y)
-        self.log('train_loss', loss)
-        return loss
-
-    def validation_step(self, batch, batch_idx):
-        x, y = batch
-        y_hat = self(x)
-        loss = nn.MSELoss()(y_hat, y)
-        self.log('val_loss', loss)
-
-    def configure_optimizers(self):
-        optimizer = torch.optim.Adam(self.parameters(), lr=1e-3)
-        return optimizer
-
-
-# Reshape labels for TabNet compatibility
-Y_train = Y_train.values.reshape(-1, 1)  # Reshape to 2D
-Y_val = Y_val.values.reshape(-1, 1)      # Reshape to 2D
-
-# Instantiate TabNet model
-tabnet_model = TabNetRegressor()
-tabnet_model.fit(
-    X_train, Y_train,  # Use reshaped Y_train
-    eval_set=[(X_val, Y_val)],  # Use reshaped Y_val
-    eval_metric=['rmse'],
-    patience=5,
-    max_epochs=50
-)
-
-# Instantiate CNN model
-input_dim = X_train_tensor.shape[1]
-cnn_model = SoftOrdering1DCNN(input_dim=input_dim)
-
-# Instantiate Ensemble model
-ensemble_model = EnsembleModel(cnn_model, tabnet_model)
-
-# Train Ensemble model
-trainer = pl.Trainer(max_epochs=50, callbacks=[early_stopping])
-trainer.fit(ensemble_model, train_loader, test_loader)
-
-# Evaluate Ensemble model
-ensemble_predictions = []
-ensemble_model.eval()
-with torch.no_grad():
-    for x, _ in test_loader:
-        ensemble_predictions.append(ensemble_model(x))
-ensemble_predictions = torch.cat(ensemble_predictions).detach().numpy()
-
-# Calculate and print evaluation metrics for ensemble
-mse = mean_squared_error(Y_test, ensemble_predictions)
-mae = mean_absolute_error(Y_test, ensemble_predictions)
-r2 = r2_score(Y_test, ensemble_predictions)
-kendall_tau_corr, _ = kendalltau(Y_test, ensemble_predictions)
-
-print('Ensemble Mean Squared Error:', mse)
-print('Ensemble Mean Absolute Error:', mae)
-print('Ensemble R2 Score:', r2)
-print('Ensemble Kendall Tau:', kendall_tau_corr)
