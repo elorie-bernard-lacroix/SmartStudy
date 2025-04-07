@@ -5,7 +5,6 @@ from loguru import logger
 from tqdm import tqdm
 import pandas as pd
 from tabpfn import TabPFNRegressor
-from sklearn.metrics import mean_squared_error, mean_absolute_error
 import joblib
 
 from smartstudy.config import MODELS_DIR, PROCESSED_DATA_DIR

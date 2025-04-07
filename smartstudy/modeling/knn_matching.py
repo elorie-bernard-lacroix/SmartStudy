@@ -5,7 +5,7 @@ def get_similar_students(data, age, gender, parental_education, desired_grade):
     excluded_columns = ['StudyTimeWeekly', 'Absences', 'Tutoring', 'ParentalSupport',
                         'Extracurricular', 'Sports', 'Music', 'Volunteering']
     
-# Create the neighborhood DataFrame by dropping specific columns
+    # Create the neighborhood DataFrame by dropping specific columns
     neighborhood = data.drop(columns=excluded_columns)
 
    
@@ -17,7 +17,7 @@ def get_similar_students(data, age, gender, parental_education, desired_grade):
     }
     user_query = pd.DataFrame(user_query, index=[0])
 
-# apply weights
+    # apply weights
     weights = {
         'Age': 1.0,
         'Gender': 2.0,
