@@ -4,11 +4,10 @@
     <img src="https://img.shields.io/badge/CCDS-Project%20template-328F97?logo=cookiecutter" />
 </a>
 
-Students often feel overwhelmed with work, deadlines, and extracurriculars. The stress of managing these responsibilities can make it difficult for students to establish effective study habits. In this proposal, we discuss the development of a machine learning model designed to recommend personalized lifestyle changes, such as the optimal weekly study time, the need for tutoring, and increased lecture attendance for students. Overall, this tool aims to increase organization and time-management among students and ultimately help them succeed academically.
+Students often feel overwhelmed with work, deadlines, and extracurriculars. The stress of managing these responsibilities can make it difficult for students to establish effective study habits. In this proposal, we discuss the development of a machine learning model designed to recommend personalized lifestyle changes, such as the optimal weekly study time, the need for tutoring, and increased lecture attendance for students. Overall, this tool aims to increase organization and time-management among students and ultimately help them succeed academically. 
 
-# Demo
-Refer to this [video](https://drive.google.com/file/d/170J3CPyDbNzxmfz8pdjehuGcOqb4MOU6/view?usp=sharing) for a demo of our project.
-
+Our project [demo](https://drive.google.com/file/d/170J3CPyDbNzxmfz8pdjehuGcOqb4MOU6/view?usp=sharing) walks you through the user interface of the project and expected inputs and outputs. You can run this script yourself using the 3.5 notebooks on google colab or by cloning this package and installing it locally.
+  
 ## Project Organization
 
 ```
