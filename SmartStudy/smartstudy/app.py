@@ -1,11 +1,11 @@
 import gradio as gr
 import pandas as pd
 
-from smartstudy.modeling.optimizer import optimize_study_habits
-from smartstudy.modeling.knn_matching import get_similar_students
-from smartstudy.modeling.gpt_utils import generate_recommendations_gpt4
+from modeling.optimizer import optimize_study_habits
+from modeling.knn_matching import get_similar_students
+from modeling.gpt_utils import generate_recommendations_gpt4
 
-from smartstudy.config import MODELS_DIR, PROCESSED_DATA_DIR
+from config import MODELS_DIR, PROCESSED_DATA_DIR
 
 def demo_app(age, gender, parental_education, study_time, absences, tutoring, parental_support,
              extracurricular, sports, music, volunteering, target_gpa):
