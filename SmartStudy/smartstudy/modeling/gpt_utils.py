@@ -1,5 +1,7 @@
 import openai
 
+openai.api_key = "your key"#replace with actual key
+
 def generate_recommendations_gpt4(current_habits, optimized_habits, desired_grade):
     prompt = f"""
 You are an academic coach. A student wants to raise their GPA to {desired_grade}.

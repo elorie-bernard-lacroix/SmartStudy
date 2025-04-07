@@ -31,8 +31,13 @@ def optimize_study_habits(fixed_user_data, reg, scaler, desired_grade):
         input_vec = scaler.transform(df)
         pred = reg.predict([input_vec[0]])[0]
         return abs(desired_grade - pred)
+    print("Starting optimization...")
 
-    result = gp_minimize(objective, space, n_calls=50, random_state=0)
+    result = gp_minimize(objective, space, n_calls=10, random_state=0)
+    print("Optimization completed.")
+    print("Best score:", result.fun)
+
+
     optimized = dict(zip([dim.name for dim in space], result.x))
     fixed_user_data.update(optimized)
     return fixed_user_data, result.fun
