@@ -1,20 +1,18 @@
 import gradio as gr
 import pandas as pd
+import joblib
 
 from modeling.optimizer import optimize_study_habits
 from modeling.knn_matching import get_similar_students
 from modeling.gpt_utils import generate_recommendations_gpt4
-
 from config import MODELS_DIR, PROCESSED_DATA_DIR
+
+reg = joblib.load(MODELS_DIR / "tabpfn.pkl")
+scaler = joblib.load(MODELS_DIR / "scaler.pkl")
 
 def demo_app(age, gender, parental_education, study_time, absences, tutoring, parental_support,
              extracurricular, sports, music, volunteering, target_gpa):
 
-    # Paths to the model and features
-    model_path = MODELS_DIR / "tabpfn.pkl"
-    neighborhood_path = PROCESSED_DATA_DIR / "processed_data.csv"
-
-    # Optimize the study habits using optimizer module
     current_habits = {
         'Age': age,
         'Gender': gender,
@@ -34,8 +32,9 @@ def demo_app(age, gender, parental_education, study_time, absences, tutoring, pa
         'Gender': gender,
         'ParentalEducation': parental_education
     }
-    optimized_values, _ = optimize_study_habits(user_fixed, model_path, neighborhood_path, target_gpa)
 
+    # optimize study habits
+    optimized_values, _ = optimize_study_habits(user_fixed, reg, scaler, target_gpa)
 
     optimized_habits = {
         'StudyTimeWeekly': optimized_values['StudyTimeWeekly'],
@@ -50,9 +49,8 @@ def demo_app(age, gender, parental_education, study_time, absences, tutoring, pa
 
     summary = generate_recommendations_gpt4(current_habits, {**user_fixed, **optimized_habits}, target_gpa)
 
-
-    # Find similar students using knn_matching module
-    data = pd.read_csv(neighborhood_path)
+    # Find similar students
+    data = pd.read_csv(PROCESSED_DATA_DIR / "processed_data.csv")
     similar_students = get_similar_students(data, age, gender, parental_education, target_gpa)
 
     example_table = similar_students[[
@@ -62,14 +60,14 @@ def demo_app(age, gender, parental_education, study_time, absences, tutoring, pa
     result_table = pd.DataFrame([optimized_habits])
     return result_table, example_table, summary
 
-# Build the gradio interface
+#  the gradio interface
 def app_ui():
     with gr.Blocks() as app:
-        gr.Markdown("### 🧠 Fill in your current habits and target GPA:")
+        gr.Markdown("### \U0001F9E0 Fill in your current habits and target GPA:")
 
         with gr.Row():
-            age = gr.Number(label="🧒 Age", value=15)
-            gender = gr.Radio([0, 1], label="⚧️ Gender (0=Male, 1=Female)", value=0)
+            age = gr.Number(label="\U0001F9D2 Age", value=15)
+            gender = gr.Radio([0, 1], label="♂️ Gender (0=Male, 1=Female)", value=0)
             parental_education = gr.Dropdown(
                 choices=[0, 1, 2, 3, 4],
                 label="🎓 Parental Education (0=None, 1=High School, 2=College, 3=Bachelor's, 4=Higher)",
@@ -77,7 +75,7 @@ def app_ui():
             )
 
         with gr.Row():
-            study_time = gr.Number(label="📘 Study Time Weekly (hrs)", value=0.0)
+            study_time = gr.Number(label="📚 Study Time Weekly (hrs)", value=0.0)
             absences = gr.Number(label="🚫 Absences (0–30)", value=10)
             tutoring = gr.Radio([0, 1], label="🎓 Tutoring (0=No, 1=Yes)", value=0)
             parental_support = gr.Slider(0, 4, step=1,
@@ -87,7 +85,7 @@ def app_ui():
             extracurricular = gr.Radio([0, 1], label="🎭 Extracurricular", value=0)
             sports = gr.Radio([0, 1], label="🏀 Sports", value=0)
             music = gr.Radio([0, 1], label="🎵 Music", value=0)
-            volunteering = gr.Radio([0, 1], label="🙌 Volunteering", value=0)
+            volunteering = gr.Radio([0, 1], label="💪 Volunteering", value=0)
 
         target_gpa = gr.Number(label="🎯 Target GPA", value=0.0)
 
@@ -105,7 +103,7 @@ def app_ui():
                      outputs=[output1, output2, output3])
     return app
 
-#landing page
+# landing Page
 with gr.Blocks() as landing:
     gr.Markdown("""
     <center>
