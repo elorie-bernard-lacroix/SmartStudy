@@ -2,6 +2,8 @@ import pandas as pd
 from skopt import gp_minimize
 from skopt.space import Real, Integer, Categorical
 from skopt.utils import use_named_args
+import joblib
+from sklearn.preprocessing import StandardScaler
 
 def get_search_space():
     return [
@@ -15,7 +17,10 @@ def get_search_space():
         Categorical([0, 1], name='Volunteering')
     ]
 
+
 def optimize_study_habits(fixed_user_data, reg, scaler, desired_grade):
+    
+    # define search space for optimization
     space = get_search_space()
 
     @use_named_args(space)

@@ -15,11 +15,9 @@ app = typer.Typer()
 
 @app.command()
 def main(
-    # ---- REPLACE DEFAULT PATHS AS APPROPRIATE ----
     features_path: Path = PROCESSED_DATA_DIR / "train_features.csv",
     labels_path: Path = PROCESSED_DATA_DIR / "train_labels.csv",
     model_path: Path = MODELS_DIR / "tabpfn.pkl",
-    # -----------------------------------------
 ):
     # ---- TabPFN ----
     logger.info("Training some model...")

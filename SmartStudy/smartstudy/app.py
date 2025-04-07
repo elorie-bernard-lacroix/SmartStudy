@@ -5,10 +5,18 @@ from models.tabpfn_model import train_tabpfn, evaluate_tabpfn
 from models.optimizer import optimize_study_habits
 from models.knn_matching import get_similar_students
 
+from pathlib import Path
+from smartstudy.config import MODELS_DIR, PROCESSED_DATA_DIR
+import joblib
+from loguru import logger
 
 
 def demo_app(age, gender, parental_education, study_time, absences, tutoring, parental_support,
              extracurricular, sports, music, volunteering, target_gpa):
+
+    # Paths to the model and features
+    model_path = MODELS_DIR / "tabpfn.pkl"
+    neighborhood_path = PROCESSED_DATA_DIR / "processed_data.csv"
 
     current_habits = {
         'Age': age,
@@ -23,26 +31,28 @@ def demo_app(age, gender, parental_education, study_time, absences, tutoring, pa
         'Music': music,
         'Volunteering': volunteering
     }
-#optimize habits
-    def optimize(user_fixed):
-        @use_named_args(space)
-        def objective(**params):
-            user_data = user_fixed.copy()
-            user_data.update(params)
-            df = pd.DataFrame(user_data, index=[0])
-            input_vec = scaler.transform(df)
-            pred = reg.predict(input_vec)[0]
-            return abs(target_gpa - pred)
+    
+    #optimize habits
+    
+    # def optimize(user_fixed):
+    #     @use_named_args(space)
+    #     def objective(**params):
+    #         user_data = user_fixed.copy()
+    #         user_data.update(params)
+    #         df = pd.DataFrame(user_data, index=[0])
+    #         input_vec = scaler.transform(df)
+    #         pred = reg.predict(input_vec)[0]
+    #         return abs(target_gpa - pred)
 
-        result = gp_minimize(objective, space, n_calls=50, random_state=0)
-        return dict(zip([dim.name for dim in space], result.x))
+    #     result = gp_minimize(objective, space, n_calls=50, random_state=0)
+    #     return dict(zip([dim.name for dim in space], result.x))
 
     user_fixed = {
         'Age': age,
         'Gender': gender,
         'ParentalEducation': parental_education
     }
-    optimized_habits, _ = optimize_study_habits(user_fixed, reg, scaler, target_gpa)
+    optimized_values, _ = optimize_study_habits(user_fixed, model_path, neighborhood_path, target_gpa)
 
 
     optimized_habits = {
@@ -57,7 +67,10 @@ def demo_app(age, gender, parental_education, study_time, absences, tutoring, pa
     }
 
     summary = generate_recommendations_gpt4(current_habits, {**user_fixed, **optimized_habits}, target_gpa)
-#for similar students using knn
+
+
+    # for similar students using knn
+    data = pd.read_csv(neighborhood_path)
     similar_students = get_similar_students(data, age, gender, parental_education, target_gpa)
 
     example_table = similar_students[[
@@ -111,7 +124,7 @@ def app_ui():
     return app
 
 #landing page
-  with gr.Blocks() as landing:
+with gr.Blocks() as landing:
     gr.Markdown("""
     <center>
     <h1>🎓 <span style='color:#4A90E2'>Your Personalized GPA Booster:</span> SmartStudy</h1>

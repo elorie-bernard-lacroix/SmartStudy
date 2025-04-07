@@ -1,7 +1,7 @@
 import pandas as pd
 from pathlib import Path
 
-input_path = Path("SmartStudy\\data\\raw\\databsae.csv")
+input_path = Path("SmartStudy\\data\\raw\\database.csv")
 output_path = Path("SmartStudy\\data\\processed\\processed_data.csv")
 
 data = pd.read_csv(input_path)
