@@ -1,9 +1,10 @@
 import gradio as gr
 import pandas as pd
 from sklearn.neighbors import NearestNeighbors
-from models.tabpfn_model import train_tabpfn, evaluate_tabpfn
-from models.optimizer import optimize_study_habits
-from models.knn_matching import get_similar_students
+
+from smartstudy.modeling.optimizer import optimize_study_habits
+from smartstudy.modeling.knn_matching import get_similar_students
+from smartstudy.modeling.gpt_utils import generate_recommendations_gpt4
 
 from pathlib import Path
 from smartstudy.config import MODELS_DIR, PROCESSED_DATA_DIR
