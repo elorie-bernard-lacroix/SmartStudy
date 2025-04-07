@@ -23,7 +23,7 @@ def demo_app(age, gender, parental_education, study_time, absences, tutoring, pa
         'Music': music,
         'Volunteering': volunteering
     }
-
+#optimize habits
     def optimize(user_fixed):
         @use_named_args(space)
         def objective(**params):
@@ -57,7 +57,7 @@ def demo_app(age, gender, parental_education, study_time, absences, tutoring, pa
     }
 
     summary = generate_recommendations_gpt4(current_habits, {**user_fixed, **optimized_habits}, target_gpa)
-
+#for similar students using knn
     similar_students = get_similar_students(data, age, gender, parental_education, target_gpa)
 
     example_table = similar_students[[
