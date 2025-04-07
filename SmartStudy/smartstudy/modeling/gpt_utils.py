@@ -28,6 +28,5 @@ Please explain how these changes will help the student reach their goal. Use cle
         )
 
     response_text = response.choices[0].message.content
-    display(Markdown(f"<pre>{response_text}</pre>"))
 
     return response_text
