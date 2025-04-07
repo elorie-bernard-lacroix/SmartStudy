@@ -1,29 +1,21 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
 from pathlib import Path
 
-import typer
-from loguru import logger
-from tqdm import tqdm
+input_path = Path("/content/drive/MyDrive/ECE324_Project/Model/processed_data.csv")
+output_dir = Path("/content/drive/MyDrive/ECE324_Project/Model/processed_split")
+output_dir.mkdir(parents=True, exist_ok=True)
 
-from smartstudy.config import PROCESSED_DATA_DIR
+data = pd.read_csv(input_path)
 
-app = typer.Typer()
+X = data.drop(columns=["GPA"])
+y = data["GPA"]
 
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-@app.command()
-def main(
-    # ---- REPLACE DEFAULT PATHS AS APPROPRIATE ----
-    input_path: Path = PROCESSED_DATA_DIR / "dataset.csv",
-    output_path: Path = PROCESSED_DATA_DIR / "features.csv",
-    # -----------------------------------------
-):
-    # ---- REPLACE THIS WITH YOUR OWN CODE ----
-    logger.info("Generating features from dataset...")
-    for i in tqdm(range(10), total=10):
-        if i == 5:
-            logger.info("Something happened for iteration 5.")
-    logger.success("Features generation complete.")
-    # -----------------------------------------
+X_train.to_csv(output_dir / "train_features.csv", index=False)
+y_train.to_csv(output_dir / "train_labels.csv", index=False)
+X_test.to_csv(output_dir / "test_features.csv", index=False)
+y_test.to_csv(output_dir / "test_labels.csv", index=False)
 
-
-if __name__ == "__main__":
-    app()
+print("saved to:", output_dir)
