@@ -2,8 +2,8 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from pathlib import Path
 
-input_path = Path("/content/drive/MyDrive/ECE324_Project/Model/processed_data.csv")
-output_dir = Path("/content/drive/MyDrive/ECE324_Project/Model/processed_split")
+input_path = Path("SmartStudy\\data\\raw")
+output_dir = Path("SmartStudy\\data\\processed")
 output_dir.mkdir(parents=True, exist_ok=True)
 
 data = pd.read_csv(input_path)

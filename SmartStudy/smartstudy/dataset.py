@@ -1,8 +1,8 @@
 import pandas as pd
 from pathlib import Path
 
-input_path = Path("/content/drive/MyDrive/ECE324_Project/Model/database.csv")
-output_path = Path("/content/drive/MyDrive/ECE324_Project/Model/processed_data.csv")
+input_path = Path("SmartStudy\\data\\raw\\databsae.csv")
+output_path = Path("SmartStudy\\data\\processed\\processed_data.csv")
 
 data = pd.read_csv(input_path)
 print("Original shape:", data.shape)
