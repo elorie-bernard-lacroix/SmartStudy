@@ -1,7 +1,6 @@
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 import joblib
-from pathlib import Path
 
 from config import PROCESSED_DATA_DIR, MODELS_DIR
 

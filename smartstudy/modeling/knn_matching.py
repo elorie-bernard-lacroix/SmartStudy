@@ -8,7 +8,6 @@ def get_similar_students(data, age, gender, parental_education, desired_grade):
     # Create the neighborhood DataFrame by dropping specific columns
     neighborhood = data.drop(columns=excluded_columns)
 
-   
     user_query = {
         'Age': age,
         'Gender': gender,

@@ -2,8 +2,6 @@ import pandas as pd
 from skopt import gp_minimize
 from skopt.space import Real, Integer, Categorical
 from skopt.utils import use_named_args
-import joblib
-from sklearn.preprocessing import StandardScaler
 
 def get_search_space():
     return [
@@ -36,7 +34,6 @@ def optimize_study_habits(fixed_user_data, reg, scaler, desired_grade):
     result = gp_minimize(objective, space, n_calls=10, random_state=0)
     print("Optimization completed.")
     print("Best score:", result.fun)
-
 
     optimized = dict(zip([dim.name for dim in space], result.x))
     fixed_user_data.update(optimized)
